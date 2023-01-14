@@ -1,4 +1,4 @@
-# TypedAxiosInstance
+# Typed Axios `typed-axios-instance`
 
 ![](https://user-images.githubusercontent.com/1910070/212500697-38b99c4f-6022-4c82-8615-846c50b77b6a.png)
 
