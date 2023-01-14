@@ -1,0 +1,23 @@
+{
+  "name": "typed-axios",
+  "version": "1.0.0",
+  "description": "Typed Axios is a simple way to create an Axios instance that is fully typed with the routes from an application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seamapi/typed-axios.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/seamapi/typed-axios/issues"
+  },
+  "homepage": "https://github.com/seamapi/typed-axios#readme",
+  "dependencies": {
+    "axios": "^1.2.2"
+  }
+}
