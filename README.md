@@ -2,7 +2,7 @@
 
 ![](https://user-images.githubusercontent.com/1910070/212500697-38b99c4f-6022-4c82-8615-846c50b77b6a.png)
 
-Typed Axios Instance is a simple way to create an Axios instance that is fully typed with the routes from an application.
+Typed Axios Instance is a simple way to create an Axios instance that is fully typed with the routes from an API.
 
 The benefit of using TypedAxiosInstance is you don't need to create or import a client
 for a third party API, you can just apply types (generated from [OpenAPI](#) or
