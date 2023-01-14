@@ -1,24 +1,4 @@
-import type { AxiosRequestConfig, AxiosInstance } from "axios"
-
-type TestRoutes = {
-  "/things/create": {
-    route: "/things/create"
-    method: "POST"
-    queryParams: {}
-    jsonBody: {
-      name?: string | undefined
-    }
-    commonParams: {}
-    formData: {}
-    jsonResponse: {
-      thing: {
-        thing_id: string
-        name: string
-        created_at: string | Date
-      }
-    }
-  }
-}
+import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
 
 type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS"
 
@@ -51,8 +31,8 @@ export type RouteRequestParams<
 
 export interface ExtendedAxiosRequestConfig<
   Routes extends APIDef,
-  URL extends keyof Routes,
-  Method extends Routes[URL]["method"]
+  URL extends keyof Routes = keyof Routes,
+  Method extends Routes[URL]["method"] = Routes[URL]["method"]
 > extends Omit<AxiosRequestConfig, "url" | "method" | "data"> {
   url: URL
   method: Method
@@ -60,10 +40,58 @@ export interface ExtendedAxiosRequestConfig<
   data?: RouteRequestBody<Routes, URL>
 }
 
-interface TypedAxios<Routes extends APIDef> {
+export interface TypedAxios<Routes extends APIDef> {
+  defaults: AxiosInstance["defaults"]
+  interceptors: AxiosInstance["interceptors"]
+  getUri(config?: ExtendedAxiosRequestConfig<Routes>): string
   post<URL extends keyof Routes>(
     url: URL,
-    data?: Routes[URL]["jsonBody"]
-    // config?: Omit<ExtendedAxiosRequestConfig<URL, "POST">, "data">
-  ): Promise<RouteResponse<Routes, URL>>
+    data: Routes[URL]["jsonBody"],
+    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "POST">, "data">
+  ): Promise<AxiosResponse<RouteResponse<Routes, URL>>>
+
+  // request<T = any, R = AxiosResponse<T>, D = any>(
+  //   config: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // get<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // delete<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // head<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // options<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // put<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   data?: D,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // patch<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   data?: D,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // postForm<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   data?: D,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // putForm<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   data?: D,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
+  // patchForm<T = any, R = AxiosResponse<T>, D = any>(
+  //   url: string,
+  //   data?: D,
+  //   config?: AxiosRequestConfig<D>
+  // ): Promise<R>
 }
