@@ -1,5 +1,7 @@
 # TypedAxiosInstance
 
+![](https://user-images.githubusercontent.com/1910070/212500697-38b99c4f-6022-4c82-8615-846c50b77b6a.png)
+
 Typed Axios Instance is a simple way to create an Axios instance that is fully typed with the routes from an application.
 
 The benefit of using TypedAxiosInstance is you don't need to create or import a client
@@ -11,8 +13,8 @@ import type { TypedAxios } from "typed-axios-instance"
 import axios from "axios"
 
 // Need help generating these routes? You can generate them from...
-// openapi: https://openapi-to-route-types.com
 // nextlove: https://github.com/seamapi/nextlove
+// openapi: TODO
 type Routes = [
   {
     route: "/things/create"
@@ -38,8 +40,8 @@ const myAxiosInstance: TypedAxios<Routes> = axios.create({
 ```
 
 ![](https://user-images.githubusercontent.com/1910070/212500619-5d2f4568-7e8a-4a9f-9a4b-0c7c4fa4227a.png)
+
 ![](https://user-images.githubusercontent.com/1910070/212500659-9c9ff64d-5ffa-4033-81bb-c84a780587ad.png)
-![](https://user-images.githubusercontent.com/1910070/212500697-38b99c4f-6022-4c82-8615-846c50b77b6a.png)
 
 ## Installation
 
