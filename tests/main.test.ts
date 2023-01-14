@@ -1,10 +1,10 @@
 import test from "ava"
 import { expectTypeOf } from "expect-type"
-import { TypedAxios } from "../src"
-import { ExampleRouteTypes } from "./example-route-types"
+import { MatchingRoute, TypedAxios } from "../src"
+import { ExampleRouteTypes1 } from "./example-route-types"
 
 test("TypedAxios should create nicely typed AxiosInstance", async (t) => {
-  const axios: TypedAxios<ExampleRouteTypes> = null as any
+  const axios: TypedAxios<ExampleRouteTypes1> = null as any
   const createRes = await axios.post("/things/create", { name: "thing" })
   expectTypeOf(createRes.data).toMatchTypeOf<{
     thing: {
