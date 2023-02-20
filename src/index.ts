@@ -1,6 +1,6 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
 
-type HTTPMethod =
+export type HTTPMethod =
   | "GET"
   | "POST"
   | "PUT"
