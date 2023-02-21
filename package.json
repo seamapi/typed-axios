@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsup ./src --dts --sourcemap",
     "test": "npm run typecheck",
+    "format": "prettier -w .",
     "typecheck": "tsc --noEmit"
   },
   "repository": {

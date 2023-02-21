@@ -1,4 +1,5 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
+import type { SetOptional } from "type-fest"
 
 export type HTTPMethod =
   | "GET"
@@ -37,7 +38,7 @@ export type MatchingRoute<
   Method extends HTTPMethod = HTTPMethod
 > = Routes extends RouteDef[]
   ? Extract<Routes[number], { route: Path; method: Method }>
-  : Extract<Routes[keyof Routes], { route: Path; method: Method }>
+  : Extract<Routes[keyof Routes], { route: Path }>
 
 export type RouteResponse<
   Routes extends APIDef,
@@ -70,17 +71,29 @@ export interface ExtendedAxiosRequestConfig<
   data?: RouteRequestBody<Routes, URL>
 }
 
+export type ExtendedAxiosRequestConfigForMethod<
+  Routes extends APIDef,
+  URL extends AnyRoutePath<Routes> = AnyRoutePath<Routes>,
+  Method extends HTTPMethod = MatchingRoute<Routes, URL>["method"]
+> = SetOptional<
+  ExtendedAxiosRequestConfig<Routes, URL, Method>,
+  "url" | "method"
+>
+
 export interface TypedAxios<Routes extends APIDef> {
   defaults: AxiosInstance["defaults"]
   interceptors: AxiosInstance["interceptors"]
-  getUri(config?: ExtendedAxiosRequestConfig<Routes>): string
+  getUri(config?: ExtendedAxiosRequestConfigForMethod<Routes>): string
   post<
     URL extends PathWithMethod<Routes, "POST">,
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
     data: MR["jsonBody"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "POST">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "POST">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "POST">>>
   put<
     URL extends PathWithMethod<Routes, "PUT">,
@@ -88,19 +101,22 @@ export interface TypedAxios<Routes extends APIDef> {
   >(
     url: URL,
     data: MR["jsonBody"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "PUT">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "PUT">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "PUT">>>
   get<URL extends PathWithMethod<Routes, "GET">>(
     url: URL,
-    config?: ExtendedAxiosRequestConfig<Routes, URL, "GET">
+    config?: ExtendedAxiosRequestConfigForMethod<Routes, URL, "GET">
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "GET">>>
   head<URL extends PathWithMethod<Routes, "HEAD">>(
     url: URL,
-    config?: ExtendedAxiosRequestConfig<Routes, URL, "HEAD">
+    config?: ExtendedAxiosRequestConfigForMethod<Routes, URL, "HEAD">
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "HEAD">>>
   delete<URL extends PathWithMethod<Routes, "DELETE">>(
     url: URL,
-    config?: ExtendedAxiosRequestConfig<Routes, URL, "DELETE">
+    config?: ExtendedAxiosRequestConfigForMethod<Routes, URL, "DELETE">
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "DELETE">>>
   patch<
     URL extends PathWithMethod<Routes, "PATCH">,
@@ -108,11 +124,14 @@ export interface TypedAxios<Routes extends APIDef> {
   >(
     url: URL,
     data: MR["jsonBody"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "PATCH">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "PATCH">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "PATCH">>>
   options<URL extends PathWithMethod<Routes, "OPTIONS">>(
     url: URL,
-    config?: ExtendedAxiosRequestConfig<Routes, URL, "OPTIONS">
+    config?: ExtendedAxiosRequestConfigForMethod<Routes, URL, "OPTIONS">
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "OPTIONS">>>
   postForm<
     URL extends PathWithMethod<Routes, "POST">,
@@ -120,7 +139,10 @@ export interface TypedAxios<Routes extends APIDef> {
   >(
     url: URL,
     data: MR["formData"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "POST">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "POST">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "POST">>>
   putForm<
     URL extends PathWithMethod<Routes, "PUT">,
@@ -128,7 +150,10 @@ export interface TypedAxios<Routes extends APIDef> {
   >(
     url: URL,
     data: MR["formData"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "PUT">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "PUT">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "PUT">>>
   patchForm<
     URL extends PathWithMethod<Routes, "PATCH">,
@@ -136,7 +161,10 @@ export interface TypedAxios<Routes extends APIDef> {
   >(
     url: URL,
     data: MR["formData"],
-    config?: Omit<ExtendedAxiosRequestConfig<Routes, URL, "PATCH">, "data">
+    config?: Omit<
+      ExtendedAxiosRequestConfigForMethod<Routes, URL, "PATCH">,
+      "data"
+    >
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, "PATCH">>>
   request<
     URL extends AnyRoutePath<Routes>,
