@@ -1,5 +1,5 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
-import type { SetOptional } from "type-fest"
+import type { SetOptional, Except, Simplify } from "type-fest"
 
 export type HTTPMethod =
   | "GET"
@@ -23,45 +23,104 @@ export type RouteDef = {
 
 export type APIDef = Record<string, RouteDef> | RouteDef[]
 
-export type AnyRoutePath<Routes extends APIDef> = Routes extends RouteDef[]
-  ? Routes[number]["route"]
-  : keyof Routes
+export type APIDefToUnion<Routes extends APIDef> = Routes extends RouteDef[]
+  ? Routes[number]
+  : Routes extends Record<string, RouteDef>
+  ? Routes[keyof Routes]
+  : never
+
+// Converts from `/things/[thing_id]/get` to `/things/${string}/get`
+export type ReplacePathParams<Path extends string> =
+  Path extends `${infer Before}[${infer Param}]${infer After}`
+    ? ReplacePathParams<`${Before}${string}${After}`>
+    : Path
+
+// Converts from `/things/example_thing_id/get` to `/things/${string}/get`
+export type WidenConcretePathParams<
+  Path extends string,
+  Route extends RouteDef
+> = Path extends ReplacePathParams<Route["route"]>
+  ? ReplacePathParams<Route["route"]>
+  : never
+
+export type ReplacePathParamsOnRouteDef<Route extends RouteDef> = Simplify<
+  {
+    route: ReplacePathParams<Route["route"]>
+  } & Except<Route, "route">
+>
+
+export type AnyRoutePath<Routes extends RouteDef> = Routes["route"]
+
+// Given a path and a method, widen the method type to all methods accepted for that path
+export type WidenConcreteMethod<
+  Routes extends RouteDef,
+  Path extends AnyRoutePath<Routes>,
+  Method extends HTTPMethod
+> = Extract<Routes, { route: Path }> extends infer Route
+  ? Route extends RouteDef
+    ? Method extends Route["method"]
+      ? Route["method"]
+      : never
+    : never
+  : never
 
 export type PathWithMethod<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   Method extends HTTPMethod
-> = MatchingRoute<Routes, AnyRoutePath<Routes>, Method>["route"]
+> = Extract<
+  Routes,
+  { method: WidenConcreteMethod<Routes, AnyRoutePath<Routes>, Method> }
+>["route"]
+
+export type MatchingRouteByPath<
+  Routes extends RouteDef,
+  Path extends AnyRoutePath<Routes>,
+  RoutesWithReplacedPathParams extends RouteDef = ReplacePathParamsOnRouteDef<Routes>
+> = Routes extends RouteDef
+  ? Extract<
+      Routes,
+      { route: WidenConcretePathParams<Path, RoutesWithReplacedPathParams> }
+    >
+  : never
 
 export type MatchingRoute<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = HTTPMethod
-> = Routes extends RouteDef[]
-  ? Extract<Routes[number], { route: Path; method: Method }>
-  : Extract<Routes[keyof Routes], { route: Path }>
+> = Extract<
+  Routes,
+  {
+    route: WidenConcretePathParams<Path, Routes>
+    method: WidenConcreteMethod<
+      Routes,
+      WidenConcretePathParams<Path, Routes>,
+      Method
+    >
+  }
+>
 
 export type RouteResponse<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = MatchingRoute<Routes, Path>["method"]
 > = MatchingRoute<Routes, Path, Method>["jsonResponse"]
 
 export type RouteRequestBody<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = MatchingRoute<Routes, Path>["method"],
   MR extends RouteDef = MatchingRoute<Routes, Path, Method>
 > = MR["jsonBody"] & MR["commonParams"]
 
 export type RouteRequestParams<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = MatchingRoute<Routes, Path>["method"],
   MR extends RouteDef = MatchingRoute<Routes, Path, Method>
 > = MR["queryParams"] & MR["commonParams"]
 
 export interface ExtendedAxiosRequestConfig<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   URL extends AnyRoutePath<Routes> = AnyRoutePath<Routes>,
   Method extends HTTPMethod = MatchingRoute<Routes, URL>["method"]
 > extends Omit<AxiosRequestConfig, "url" | "method" | "data" | "params"> {
@@ -72,7 +131,7 @@ export interface ExtendedAxiosRequestConfig<
 }
 
 export type ExtendedAxiosRequestConfigForMethod<
-  Routes extends APIDef,
+  Routes extends RouteDef,
   URL extends AnyRoutePath<Routes> = AnyRoutePath<Routes>,
   Method extends HTTPMethod = MatchingRoute<Routes, URL>["method"]
 > = SetOptional<
@@ -80,7 +139,10 @@ export type ExtendedAxiosRequestConfigForMethod<
   "url" | "method"
 >
 
-export interface TypedAxios<Routes extends APIDef> {
+export interface TypedAxios<
+  T extends APIDef,
+  Routes extends RouteDef = ReplacePathParamsOnRouteDef<APIDefToUnion<T>>
+> {
   defaults: AxiosInstance["defaults"]
   interceptors: AxiosInstance["interceptors"]
   getUri(config?: ExtendedAxiosRequestConfigForMethod<Routes>): string

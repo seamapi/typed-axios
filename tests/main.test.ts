@@ -1,7 +1,11 @@
 import test from "ava"
 import { expectTypeOf } from "expect-type"
-import { MatchingRoute, TypedAxios } from "../src"
-import { ExampleRouteTypes1, ExampleRouteTypes3 } from "./example-route-types"
+import { TypedAxios } from "../src"
+import {
+  ExampleRouteTypes1,
+  ExampleRouteTypes3,
+  ExampleRouteTypes4,
+} from "./example-route-types"
 
 test("TypedAxios should create nicely typed AxiosInstance", async (t) => {
   const axios: TypedAxios<ExampleRouteTypes1> = null as any
@@ -25,6 +29,9 @@ test("TypedAxios should create nicely typed AxiosInstance", async (t) => {
 
   // @ts-expect-error
   axios.post("/things/create", {})
+
+  // @ts-expect-error (wrong method)
+  axios.get("/things/create")
 })
 
 test("works with RouteDef object that has multiple methods", async (t) => {
@@ -34,6 +41,19 @@ test("works with RouteDef object that has multiple methods", async (t) => {
       thing_id: "123",
     },
   })
+
+  expectTypeOf(getRes.data).toMatchTypeOf<{
+    thing: {
+      thing_id: string
+      name: string
+      created_at: string
+    }
+  }>()
+})
+
+test("parses path parameters", async (t) => {
+  const axios: TypedAxios<ExampleRouteTypes4> = null as any
+  const getRes = await axios.get("/things/10/get")
 
   expectTypeOf(getRes.data).toMatchTypeOf<{
     thing: {
