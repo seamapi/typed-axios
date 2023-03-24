@@ -74,3 +74,20 @@ export type ExampleRouteTypes3 = {
     }
   }
 }
+
+export type ExampleRouteTypes4 = {
+  "/things/[thing_id]/get": {
+    route: "/things/[thing_id]/get"
+    method: "POST" | "GET"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      thing: {
+        thing_id: string
+        name: string
+        created_at: string
+      }
+    }
+  }
+}
