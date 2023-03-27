@@ -90,4 +90,18 @@ export type ExampleRouteTypes4 = {
       }
     }
   }
+  "/things/[thing_id]/update": {
+    route: "/things/[thing_id]/update"
+    method: "POST"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      thing_update: {
+        thing_id: string
+        name: string
+        created_at: string
+      }
+    }
+  }
 }
