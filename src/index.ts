@@ -1,5 +1,5 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
-import type { SetOptional, Except, Simplify } from "type-fest"
+import type { SetOptional, Except, Simplify, Split } from "type-fest"
 
 export type HTTPMethod =
   | "GET"
@@ -92,13 +92,15 @@ export type MatchingRoute<
   Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = HTTPMethod
-> = Extract<
-  Routes,
-  {
-    route: WidenConcretePathParams<Path, Routes>
-    method: Method
-  }
->
+> = Routes extends infer Route
+  ? Route extends RouteDef
+    ? Split<Path, "/"> extends Split<Route["route"], "/">
+      ? Route["method"] extends Method
+        ? Route
+        : never
+      : never
+    : never
+  : never
 
 export type RouteResponse<
   Routes extends RouteDef,
