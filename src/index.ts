@@ -1,5 +1,5 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
-import type { SetOptional, Except, Simplify } from "type-fest"
+import type { SetOptional, Except, Simplify, Split } from "type-fest"
 
 export type HTTPMethod =
   | "GET"
@@ -29,6 +29,20 @@ export type APIDefToUnion<Routes extends APIDef> = Routes extends RouteDef[]
   ? Routes[keyof Routes]
   : never
 
+// Given a union of {method: "GET" | "POST", ...} | {method: "PATCH", ...} converts it to a union of
+// {method: "GET", ...} | {method: "POST", ...} | {method: "PATCH", ...}
+export type ExplodeMethodsOnRouteDef<Route extends RouteDef> = Route extends any
+  ? Route extends { method: infer Method }
+    ? Method extends HTTPMethod
+      ? Simplify<
+          {
+            method: Method
+          } & Except<Route, "method">
+        >
+      : never
+    : never
+  : never
+
 // Converts from `/things/[thing_id]/get` to `/things/${string}/get`
 export type ReplacePathParams<Path extends string> =
   Path extends `${infer Before}[${infer Param}]${infer After}`
@@ -37,40 +51,31 @@ export type ReplacePathParams<Path extends string> =
 
 // Converts from `/things/example_thing_id/get` to `/things/${string}/get`
 export type WidenConcretePathParams<
-  Path extends string,
+  Path extends AnyRoutePath<Route>,
   Route extends RouteDef
-> = Path extends ReplacePathParams<Route["route"]>
-  ? ReplacePathParams<Route["route"]>
-  : never
-
-export type ReplacePathParamsOnRouteDef<Route extends RouteDef> = Simplify<
-  {
-    route: ReplacePathParams<Route["route"]>
-  } & Except<Route, "route">
->
-
-export type AnyRoutePath<Routes extends RouteDef> = Routes["route"]
-
-// Given a path and a method, widen the method type to all methods accepted for that path
-export type WidenConcreteMethod<
-  Routes extends RouteDef,
-  Path extends AnyRoutePath<Routes>,
-  Method extends HTTPMethod
-> = Extract<Routes, { route: Path }> extends infer Route
-  ? Route extends RouteDef
-    ? Method extends Route["method"]
-      ? Route["method"]
+> = Route extends any
+  ? Route extends { route: infer WidenedPath }
+    ? Path extends WidenedPath
+      ? WidenedPath
       : never
     : never
   : never
 
+export type ReplacePathParamsOnRouteDef<Route extends RouteDef> =
+  Route extends any
+    ? Simplify<
+        {
+          route: ReplacePathParams<Route["route"]>
+        } & Except<Route, "route">
+      >
+    : never
+
+export type AnyRoutePath<Routes extends RouteDef> = Routes["route"]
+
 export type PathWithMethod<
   Routes extends RouteDef,
   Method extends HTTPMethod
-> = Extract<
-  Routes,
-  { method: WidenConcreteMethod<Routes, AnyRoutePath<Routes>, Method> }
->["route"]
+> = Extract<Routes, { method: Method }>["route"]
 
 export type MatchingRouteByPath<
   Routes extends RouteDef,
@@ -87,17 +92,15 @@ export type MatchingRoute<
   Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = HTTPMethod
-> = Extract<
-  Routes,
-  {
-    route: WidenConcretePathParams<Path, Routes>
-    method: WidenConcreteMethod<
-      Routes,
-      WidenConcretePathParams<Path, Routes>,
-      Method
-    >
-  }
->
+> = Routes extends infer Route
+  ? Route extends RouteDef
+    ? Split<Path, "/"> extends Split<Route["route"], "/">
+      ? Route["method"] extends Method
+        ? Route
+        : never
+      : never
+    : never
+  : never
 
 export type RouteResponse<
   Routes extends RouteDef,
@@ -141,7 +144,9 @@ export type ExtendedAxiosRequestConfigForMethod<
 
 export interface TypedAxios<
   T extends APIDef,
-  Routes extends RouteDef = ReplacePathParamsOnRouteDef<APIDefToUnion<T>>
+  Routes extends RouteDef = ExplodeMethodsOnRouteDef<
+    ReplacePathParamsOnRouteDef<APIDefToUnion<T>>
+  >
 > {
   defaults: AxiosInstance["defaults"]
   interceptors: AxiosInstance["interceptors"]

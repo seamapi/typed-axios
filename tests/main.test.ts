@@ -62,4 +62,14 @@ test("parses path parameters", async (t) => {
       created_at: string
     }
   }>()
+
+  const topRes = await axios.get("/things/10")
+
+  expectTypeOf(topRes.data).toMatchTypeOf<{
+    thing_get: {
+      thing_id: string
+      name: string
+      created_at: string
+    }
+  }>()
 })
