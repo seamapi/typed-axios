@@ -1,3 +1,4 @@
+export * from "./interpolate-path"
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
 import type { SetOptional, Except, Simplify, Split } from "type-fest"
 
