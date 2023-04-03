@@ -1,35 +1,35 @@
-type PathParams<T extends string> = T extends `${infer Start}[${infer Param}]${infer End}`
-  ? Param | PathParams<End>
-  : never;
+import { Pipe, Strings, ComposeLeft, Tuples } from "hotscript";
 
-type InterpolatePath<T extends string, P extends Record<string, string>, U extends string = T> =
-  PathParams<T> extends never
-    ? U
-    : PathParams<T> extends string
-    ? ParamCase<PathParams<T>> extends keyof P
-      ? InterpolatePath<
-          string & T extends `${infer F}[${string & PathParams<T>}]${infer R}` ? `${F}${P[ParamCase<PathParams<T>>]}${R}` : never,
-          P,
-          U
-        >
-      : never
-    : never;
+type ParamsFromPathname<Pathname> = Pipe<
+Pathname,
+  [
+    Strings.Split<"/">,
+    Tuples.Filter<Strings.StartsWith<"[">>,
 
-type ParamCase<S extends string> = S extends `${infer Head}${infer Tail}`
-? `${Head extends Uppercase<Head> ? '-' : ''}${Lowercase<Head>}${ParamCase<Tail>}`
-: '';
+    Tuples.Map<
+      ComposeLeft<[
+        Strings.Trim<"[" | "]">,
+      ]>
+    >,
+    Tuples.ToUnion,
+  ]
+>;
 
-
-export function interpolatePath<T extends string, P extends Record<string, string>>(
-  path: T,
-  params?: P
-): InterpolatePath<T, P> {
+export function interpolatePath<
+  Pathname extends string,
+  Params extends ParamsFromPathname<Pathname> extends never
+    ? [undefined?]
+    : [Required<Record<ParamsFromPathname<Pathname>, string>>]
+  >(
+  path: Pathname,
+  ...params: Params
+) {
   let interpolatedPath: string = path;
-  if (!params) return interpolatedPath as InterpolatePath<T, P>;
+  if (!params) return interpolatedPath as unknown as Pathname;
 
   for (const [key, value] of Object.entries(params)) {
-    interpolatedPath = interpolatedPath.replace(`[${key}]`, value);
+    interpolatedPath = interpolatedPath.replace(`[${key}]`, value as string);
   }
 
-  return interpolatedPath as InterpolatePath<T, P>;
+  return interpolatedPath as unknown as Pathname;
 }
