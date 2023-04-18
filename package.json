@@ -21,21 +21,23 @@
     "url": "https://github.com/seamapi/typed-axios/issues"
   },
   "homepage": "https://github.com/seamapi/typed-axios#readme",
-  "dependencies": {
-    "ava": "^5.1.0",
-    "axios": "^1.2.2",
-    "esbuild": "^0.17.0",
-    "esbuild-register": "^3.4.2",
-    "expect-type": "^0.15.0",
-    "tsup": "^6.5.0",
-    "typescript": "^4.9.4"
+  "peerDependencies": {
+    "axios": ">=1.0.0",
+    "type-fest": ">=3.0.0"
   },
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^9.0.2",
     "@semantic-release/release-notes-generator": "^10.0.3",
+    "ava": "^5.1.0",
+    "axios": "^1.2.2",
+    "esbuild": "^0.17.0",
+    "esbuild-register": "^3.4.2",
+    "expect-type": "^0.15.0",
     "prettier": "^2.8.3",
-    "type-fest": "^3.7.0"
+    "tsup": "^6.5.0",
+    "type-fest": "^3.7.0",
+    "typescript": "^4.9.4"
   }
 }
