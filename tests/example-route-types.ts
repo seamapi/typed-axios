@@ -119,3 +119,34 @@ export type ExampleRouteTypes4 = {
     }
   }
 }
+
+export type WildcardAndSpecificEndpointExample = {
+  "/things/[thing_id]": {
+    route: "/things/[thing_id]"
+    method: "GET"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      thing_get: {
+        thing_id: string
+        name: string
+        created_at: string
+      }
+    }
+  }
+  "/things/all": {
+    route: "/things/all"
+    method: "GET"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      all_things: Array<{
+        thing_id: string
+        name: string
+        created_at: string
+      }>
+    }
+  }
+}
