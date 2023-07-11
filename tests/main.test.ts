@@ -5,6 +5,7 @@ import {
   ExampleRouteTypes1,
   ExampleRouteTypes3,
   ExampleRouteTypes4,
+  WildcardAndSpecificEndpointExample,
 } from "./example-route-types"
 
 test("TypedAxios should create nicely typed AxiosInstance", async (t) => {
@@ -71,5 +72,27 @@ test("parses path parameters", async (t) => {
       name: string
       created_at: string
     }
+  }>()
+})
+
+test("selects most specific type available", async (t) => {
+  const axios: TypedAxios<WildcardAndSpecificEndpointExample> = null as any
+
+  const getByIdRes = await axios.get("/things/10")
+  expectTypeOf(getByIdRes.data).toMatchTypeOf<{
+    thing_get: {
+      thing_id: string
+      name: string
+      created_at: string
+    }
+  }>()
+
+  const getAllRes = await axios.get("/things/all")
+  expectTypeOf(getAllRes.data).toMatchTypeOf<{
+    all_things: Array<{
+      thing_id: string
+      name: string
+      created_at: string
+    }>
   }>()
 })

@@ -49,18 +49,6 @@ export type ReplacePathParams<Path extends string> =
     ? ReplacePathParams<`${Before}${string}${After}`>
     : Path
 
-// Converts from `/things/example_thing_id/get` to `/things/${string}/get`
-export type WidenConcretePathParams<
-  Path extends AnyRoutePath<Route>,
-  Route extends RouteDef
-> = Route extends any
-  ? Route extends { route: infer WidenedPath }
-    ? Path extends WidenedPath
-      ? WidenedPath
-      : never
-    : never
-  : never
-
 export type ReplacePathParamsOnRouteDef<Route extends RouteDef> =
   Route extends any
     ? Simplify<
@@ -77,30 +65,34 @@ export type PathWithMethod<
   Method extends HTTPMethod
 > = Extract<Routes, { method: Method }>["route"]
 
-export type MatchingRouteByPath<
+export type ExactMatchingRouteByPath<
   Routes extends RouteDef,
-  Path extends AnyRoutePath<Routes>,
-  RoutesWithReplacedPathParams extends RouteDef = ReplacePathParamsOnRouteDef<Routes>
-> = Routes extends RouteDef
-  ? Extract<
-      Routes,
-      { route: WidenConcretePathParams<Path, RoutesWithReplacedPathParams> }
-    >
-  : never
+  Path extends AnyRoutePath<Routes>
+> = Routes extends RouteDef ? Extract<Routes, { route: Path }> : never
+
+type FilterToMostSpecificRoute<
+  Path extends string,
+  MatchedRoutes extends RouteDef
+> = ExactMatchingRouteByPath<MatchedRoutes, Path> extends never
+  ? MatchedRoutes
+  : ExactMatchingRouteByPath<MatchedRoutes, Path>
 
 export type MatchingRoute<
   Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
   Method extends HTTPMethod = HTTPMethod
-> = Routes extends infer Route
-  ? Route extends RouteDef
-    ? Split<Path, "/"> extends Split<Route["route"], "/">
-      ? Route["method"] extends Method
-        ? Route
+> = FilterToMostSpecificRoute<
+  Path,
+  Routes extends infer Route
+    ? Route extends RouteDef
+      ? Split<Path, "/"> extends Split<Route["route"], "/">
+        ? Route["method"] extends Method
+          ? Route
+          : never
         : never
       : never
     : never
-  : never
+>
 
 export type RouteResponse<
   Routes extends RouteDef,
