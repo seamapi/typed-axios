@@ -232,3 +232,28 @@ export interface TypedAxios<
     config: Config
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, Config["method"]>>>
 }
+
+export const routeFormData =
+  <
+    T extends APIDef,
+    Routes extends RouteDef = ExplodeMethodsOnRouteDef<
+      ReplacePathParamsOnRouteDef<APIDefToUnion<T>>
+    >
+    // currying is necessary to work around lack of partial type argument
+    // inference support in typescript
+  >() =>
+  <
+    URL extends PathWithMethod<Routes, "POST">,
+    MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
+  >(
+    _url: URL,
+    data: MR["formData"]
+  ) => {
+    const formData = new FormData()
+
+    for (const [key, value] of Object.entries(data ?? {})) {
+      formData.append(key, (value as any).toString())
+    }
+
+    return formData
+  }

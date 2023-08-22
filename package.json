@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup ./src --dts --sourcemap",
-    "test": "npm run typecheck",
+    "test": "npm run typecheck && ava",
     "format": "prettier -w .",
     "typecheck": "tsc --noEmit"
   },
