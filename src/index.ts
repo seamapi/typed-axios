@@ -244,6 +244,8 @@ export type TypedURLSearchParams<_T> = URLSearchParams & {
   __URLSearchParamsType?: _T
 }
 
-export const routeUrlEncodedData = <T>(data: T): TypedURLSearchParams<T> => {
+export const createTypedURLSearchParams = <T>(
+  data: T
+): TypedURLSearchParams<T> => {
   return new URLSearchParams(data as any)
 }

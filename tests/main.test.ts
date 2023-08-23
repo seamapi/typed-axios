@@ -1,7 +1,7 @@
 import { toFormData } from "axios"
 import test from "ava"
 import { expectTypeOf } from "expect-type"
-import { TypedAxios, routeUrlEncodedData } from "../src"
+import { TypedAxios, createTypedURLSearchParams } from "../src"
 import {
   ExampleRouteTypes1,
   ExampleRouteTypes3,
@@ -114,7 +114,7 @@ test("can create FormData", async (t) => {
     timestamp: new Date().toISOString(),
   }
 
-  const encodedData = routeUrlEncodedData(formData)
+  const encodedData = createTypedURLSearchParams(formData)
 
   try {
     await axios.post("/things/create", encodedData)
@@ -122,7 +122,7 @@ test("can create FormData", async (t) => {
     await axios.post(
       "/things/create",
       // @ts-expect-error
-      routeUrlEncodedData({
+      createTypedURLSearchParams({
         resourceId: 123,
         slug: "cool-resource",
       })
