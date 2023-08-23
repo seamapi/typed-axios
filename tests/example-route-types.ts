@@ -150,3 +150,18 @@ export type WildcardAndSpecificEndpointExample = {
     }
   }
 }
+
+export type FormDataExample = {
+  "/things/create": {
+    route: "/things/create"
+    method: "POST"
+    queryParams: {}
+    commonParams: {}
+    formData: {
+      resourceId: number
+      timestamp: string
+      slug: string
+    }
+    jsonResponse: {}
+  }
+}

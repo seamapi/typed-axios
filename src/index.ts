@@ -1,4 +1,9 @@
-import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
+import type {
+  AxiosResponse,
+  AxiosRequestConfig,
+  AxiosInstance,
+  GenericFormData,
+} from "axios"
 import type { SetOptional, Except, Simplify, Split } from "type-fest"
 
 export type HTTPMethod =
@@ -148,7 +153,9 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
-    data: MR["jsonBody"],
+    data: keyof MR["formData"] extends never
+      ? MR["jsonBody"]
+      : TypedURLSearchParams<MR["formData"]>,
     config?: Omit<
       ExtendedAxiosRequestConfigForMethod<Routes, URL, "POST">,
       "data"
@@ -231,4 +238,14 @@ export interface TypedAxios<
   >(
     config: Config
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, Config["method"]>>>
+}
+
+export type TypedURLSearchParams<_T> = URLSearchParams & {
+  __URLSearchParamsType?: _T
+}
+
+export const createTypedURLSearchParams = <T>(
+  data: T
+): TypedURLSearchParams<T> => {
+  return new URLSearchParams(data as any)
 }
