@@ -1,6 +1,7 @@
+import { toFormData } from "axios"
 import test from "ava"
 import { expectTypeOf } from "expect-type"
-import { TypedAxios, routeFormData } from "../src"
+import { TypedAxios, routeUrlEncodedData } from "../src"
 import {
   ExampleRouteTypes1,
   ExampleRouteTypes3,
@@ -107,14 +108,27 @@ test.failing("selects most specific type available", async (t) => {
 test("can create FormData", async (t) => {
   const axios: TypedAxios<FormDataExample> = null as any
 
-  const formData = routeFormData<FormDataExample>()("/things/create", {
+  const formData = {
     resourceId: 123,
     slug: "cool-resource",
     timestamp: new Date().toISOString(),
-  })
+  }
 
-  t.log({ formData })
+  const encodedData = routeUrlEncodedData(formData)
 
-  t.is(formData.get("resourceId"), "123")
-  t.is(formData.get("slug"), "cool-resource")
+  try {
+    await axios.post("/things/create", encodedData)
+
+    await axios.post(
+      "/things/create",
+      // @ts-expect-error
+      routeUrlEncodedData({
+        resourceId: 123,
+        slug: "cool-resource",
+      })
+    )
+  } catch (e) {}
+
+  t.is(encodedData.get("resourceId"), formData.resourceId.toString())
+  t.is(encodedData.get("slug"), formData.slug)
 })

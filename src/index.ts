@@ -1,4 +1,9 @@
-import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
+import type {
+  AxiosResponse,
+  AxiosRequestConfig,
+  AxiosInstance,
+  GenericFormData,
+} from "axios"
 import type { SetOptional, Except, Simplify, Split } from "type-fest"
 
 export type HTTPMethod =
@@ -148,7 +153,9 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
-    data: MR["jsonBody"],
+    data: keyof MR["formData"] extends never
+      ? MR["jsonBody"]
+      : TypedURLSearchParams<MR["formData"]>,
     config?: Omit<
       ExtendedAxiosRequestConfigForMethod<Routes, URL, "POST">,
       "data"
@@ -233,27 +240,10 @@ export interface TypedAxios<
   ): Promise<AxiosResponse<RouteResponse<Routes, URL, Config["method"]>>>
 }
 
-export const routeFormData =
-  <
-    T extends APIDef,
-    Routes extends RouteDef = ExplodeMethodsOnRouteDef<
-      ReplacePathParamsOnRouteDef<APIDefToUnion<T>>
-    >
-    // currying is necessary to work around lack of partial type argument
-    // inference support in typescript
-  >() =>
-  <
-    URL extends PathWithMethod<Routes, "POST">,
-    MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
-  >(
-    _url: URL,
-    data: MR["formData"]
-  ) => {
-    const formData = new FormData()
+export type TypedURLSearchParams<_T> = URLSearchParams & {
+  __URLSearchParamsType?: _T
+}
 
-    for (const [key, value] of Object.entries(data ?? {})) {
-      formData.append(key, (value as any).toString())
-    }
-
-    return formData
-  }
+export const routeUrlEncodedData = <T>(data: T): TypedURLSearchParams<T> => {
+  return new URLSearchParams(data as any)
+}
