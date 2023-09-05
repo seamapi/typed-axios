@@ -120,6 +120,38 @@ export type ExampleRouteTypes4 = {
   }
 }
 
+export type DifferentDomainsAsPathsExample = {
+  "/example.com/things/create": {
+    route: "/example.com/things/create"
+    method: "POST"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      thing: {
+        thing_id: string
+        name: string
+        created_at: string
+      }
+    }
+  }
+
+  "/foo.example.com/things/create": {
+    route: "/foo.example.com/things/create"
+    method: "POST"
+    queryParams: {}
+    commonParams: {}
+    formData: {}
+    jsonResponse: {
+      thing_from_foo: {
+        thing_id: string
+        name: string
+        created_at: string
+      }
+    }
+  }
+}
+
 export type WildcardAndSpecificEndpointExample = {
   "/things/[thing_id]": {
     route: "/things/[thing_id]"
