@@ -1,8 +1,13 @@
 import { toFormData } from "axios"
 import test from "ava"
 import { expectTypeOf } from "expect-type"
-import { TypedAxios, createTypedURLSearchParams } from "../src"
 import {
+  FilterByAndStripPrefix,
+  TypedAxios,
+  createTypedURLSearchParams,
+} from "../src"
+import {
+  DifferentDomainsAsPathsExample,
   ExampleRouteTypes1,
   ExampleRouteTypes3,
   ExampleRouteTypes4,
@@ -131,4 +136,32 @@ test("can create FormData", async (t) => {
 
   t.is(encodedData.get("resourceId"), formData.resourceId.toString())
   t.is(encodedData.get("slug"), formData.slug)
+})
+
+test.failing("", async (t) => {
+  const axios: TypedAxios<
+    FilterByAndStripPrefix<"/example.com/", DifferentDomainsAsPathsExample>
+  > = null as any
+
+  const createResponse = await axios.post("/things/create", {})
+  expectTypeOf(createResponse.data).toMatchTypeOf<{
+    thing: {
+      thing_id: string
+      name: string
+      created_at: string
+    }
+  }>()
+
+  const fooAxios: TypedAxios<
+    FilterByAndStripPrefix<"/foo.example.com/", DifferentDomainsAsPathsExample>
+  > = null as any
+
+  const fooCreateResponse = await fooAxios.post("/things/create", {})
+  expectTypeOf(fooCreateResponse.data).toMatchTypeOf<{
+    thing_from_foo: {
+      thing_id: string
+      name: string
+      created_at: string
+    }
+  }>()
 })
