@@ -1,33 +1,7 @@
 import type { AxiosResponse, AxiosRequestConfig, AxiosInstance } from "axios"
 import type { Except, SetRequired, Simplify, Split } from "type-fest"
-
-export type HTTPMethod =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "PATCH"
-  | "OPTIONS"
-  | "HEAD"
-
-export type RouteDef = {
-  route: string
-  method: HTTPMethod
-  queryParams?: Record<string, any>
-  jsonBody?: Record<string, any>
-  commonParams?: Record<string, any>
-  formData?: Record<string, any>
-  jsonResponse?: Record<string, any>
-  // TODO support error responses
-}
-
-export type APIDef = Record<string, RouteDef> | RouteDef[]
-
-export type APIDefToUnion<Routes extends APIDef> = Routes extends RouteDef[]
-  ? Routes[number]
-  : Routes extends Record<string, RouteDef>
-  ? Routes[keyof Routes]
-  : never
+import { APIDef, APIDefToUnion, RouteDef } from "./route-def"
+import { HTTPMethod } from "./http-method"
 
 // Given a union of {method: "GET" | "POST", ...} | {method: "PATCH", ...} converts it to a union of
 // {method: "GET", ...} | {method: "POST", ...} | {method: "PATCH", ...}
@@ -211,3 +185,6 @@ export const createTypedURLSearchParams = <T>(
 ): TypedURLSearchParams<T> => {
   return new URLSearchParams(data as any)
 }
+
+export * from "./helpers"
+export * from "./route-def"
