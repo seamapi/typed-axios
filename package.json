@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/seamapi/typed-axios#readme",
   "peerDependencies": {
-    "axios": ">=1.0.0",
+    "axios": ">=1.6.3",
     "type-fest": ">=3.0.0"
   },
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@semantic-release/npm": "^9.0.2",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "ava": "^5.1.0",
-    "axios": "^1.2.2",
+    "axios": "^1.6.3",
     "esbuild": "^0.17.0",
     "esbuild-register": "^3.4.2",
     "expect-type": "^0.15.0",
