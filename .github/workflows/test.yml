@@ -1,4 +1,4 @@
-name: NPM Semantic Release
+name: Test
 on:
   push:
     branches:
