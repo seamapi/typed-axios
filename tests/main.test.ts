@@ -138,7 +138,7 @@ test("can create FormData", async (t) => {
   t.is(encodedData.get("slug"), formData.slug)
 })
 
-test.failing("", async (t) => {
+test.failing("Empty Data", async (t) => {
   const axios: TypedAxios<
     FilterByAndStripPrefix<"/example.com/", DifferentDomainsAsPathsExample>
   > = null as any
