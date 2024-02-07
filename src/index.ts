@@ -91,10 +91,17 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
-    data: keyof MR["formData"] extends never
-      ? MR["jsonBody"]
-      : TypedURLSearchParams<MR["formData"]>,
-    config?: Omit<AxiosConfigForRouteDef<MR>, "data">
+    ...args: keyof MR["formData"] extends never
+      ? keyof MR["jsonBody"] extends never
+        ? [data?: any, config?: Omit<AxiosConfigForRouteDef<MR>, "data">]
+        : [
+            data: MR["jsonBody"],
+            config?: Omit<AxiosConfigForRouteDef<MR>, "data">
+          ]
+      : [
+          data: TypedURLSearchParams<MR["formData"]>,
+          config?: Omit<AxiosConfigForRouteDef<MR>, "data">
+        ]
   ): Promise<AxiosResponse<MR["jsonResponse"]>>
   put<
     URL extends PathWithMethod<Routes, "PUT">,

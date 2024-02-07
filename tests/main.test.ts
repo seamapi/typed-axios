@@ -138,12 +138,12 @@ test("can create FormData", async (t) => {
   t.is(encodedData.get("slug"), formData.slug)
 })
 
-test.failing("", async (t) => {
+test.failing("Empty Data", async (t) => {
   const axios: TypedAxios<
     FilterByAndStripPrefix<"/example.com/", DifferentDomainsAsPathsExample>
   > = null as any
 
-  const createResponse = await axios.post("/things/create", {})
+  const createResponse = await axios.post("/things/create")
   expectTypeOf(createResponse.data).toMatchTypeOf<{
     thing: {
       thing_id: string
@@ -156,7 +156,7 @@ test.failing("", async (t) => {
     FilterByAndStripPrefix<"/foo.example.com/", DifferentDomainsAsPathsExample>
   > = null as any
 
-  const fooCreateResponse = await fooAxios.post("/things/create", {})
+  const fooCreateResponse = await fooAxios.post("/things/create")
   expectTypeOf(fooCreateResponse.data).toMatchTypeOf<{
     thing_from_foo: {
       thing_id: string
