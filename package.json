@@ -1,6 +1,6 @@
 {
   "name": "typed-axios-instance",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Typed Axios is a simple way to create an Axios instance that is fully typed with the routes from an application.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
