@@ -8,6 +8,7 @@ export type RouteDef = {
   commonParams?: Record<string, any>
   formData?: Record<string, any>
   jsonResponse?: Record<string, any>
+  urlEncodedFormData?: Record<string, any>
   // TODO support error responses
 }
 

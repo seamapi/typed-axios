@@ -165,3 +165,30 @@ test.failing("Empty Data", async (t) => {
     }
   }>()
 })
+
+test.failing("urlEncodedFormData", async () => {
+  const axios: TypedAxios<{
+    "/things/create": {
+      route: "/things/create"
+      method: "POST"
+      urlEncodedFormData: {
+        thing_name: string
+      }
+    }
+  }> = null as any
+
+  await axios.post(
+    "/things/create",
+    // @ts-expect-error wrong payload
+    createTypedURLSearchParams({
+      foo: "bar",
+    })
+  )
+
+  await axios.post(
+    "/things/create",
+    createTypedURLSearchParams({
+      thing_name: "bar",
+    })
+  )
+})
