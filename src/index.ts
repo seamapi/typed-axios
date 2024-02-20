@@ -77,6 +77,11 @@ export interface AxiosConfigForRouteDef<Route extends RouteDef>
   data?: Route["jsonBody"] & Route["commonParams"]
 }
 
+type FormDataFromRouteDef<Route extends RouteDef> =
+  keyof Route["formData"] extends never
+    ? Route["urlEncodedFormData"]
+    : Route["formData"]
+
 export interface TypedAxios<
   T extends APIDef,
   Routes extends RouteDef = ExplodeMethodsOnRouteDef<
@@ -91,7 +96,7 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
-    ...args: keyof MR["formData"] extends never
+    ...args: keyof FormDataFromRouteDef<MR> extends never
       ? keyof MR["jsonBody"] extends never
         ? [data?: any, config?: Omit<AxiosConfigForRouteDef<MR>, "data">]
         : [
@@ -99,7 +104,7 @@ export interface TypedAxios<
             config?: Omit<AxiosConfigForRouteDef<MR>, "data">
           ]
       : [
-          data: TypedURLSearchParams<MR["formData"]>,
+          data: TypedURLSearchParams<FormDataFromRouteDef<MR>>,
           config?: Omit<AxiosConfigForRouteDef<MR>, "data">
         ]
   ): Promise<AxiosResponse<MR["jsonResponse"]>>
@@ -152,7 +157,7 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "POST">
   >(
     url: URL,
-    data: MR["formData"],
+    data: FormDataFromRouteDef<MR>,
     config?: Omit<AxiosConfigForRouteDef<MR>, "data">
   ): Promise<AxiosResponse<MR["jsonResponse"]>>
   putForm<
@@ -160,7 +165,7 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "PUT">
   >(
     url: URL,
-    data: MR["formData"],
+    data: FormDataFromRouteDef<MR>,
     config?: Omit<AxiosConfigForRouteDef<MR>, "data">
   ): Promise<AxiosResponse<MR["jsonResponse"]>>
   patchForm<
@@ -168,7 +173,7 @@ export interface TypedAxios<
     MR extends RouteDef = MatchingRoute<Routes, URL, "PATCH">
   >(
     url: URL,
-    data: MR["formData"],
+    data: FormDataFromRouteDef<MR>,
     config?: Omit<AxiosConfigForRouteDef<MR>, "data">
   ): Promise<AxiosResponse<MR["jsonResponse"]>>
   request<
