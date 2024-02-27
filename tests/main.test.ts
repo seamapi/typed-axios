@@ -192,3 +192,31 @@ test.failing("urlEncodedFormData", async () => {
     })
   )
 })
+
+test.failing("works when jsonBody is undefined", async () => {
+  const axios: TypedAxios<{
+    "/things/create": {
+      route: "/things/create"
+      method: "GET" | "POST"
+      jsonBody:
+        | {
+            thing_name: string
+          }
+        | undefined
+    }
+  }> = null as any
+
+  await axios.post(
+    "/things/create",
+    createTypedURLSearchParams({
+      foo: "bar",
+    })
+  )
+
+  await axios.post(
+    "/things/create",
+    createTypedURLSearchParams({
+      thing_name: "bar",
+    })
+  )
+})
