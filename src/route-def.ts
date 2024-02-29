@@ -3,12 +3,12 @@ import { HTTPMethod } from "./http-method"
 export type RouteDef = {
   route: string
   method: HTTPMethod
-  queryParams?: Record<string, any>
-  jsonBody?: Record<string, any>
-  commonParams?: Record<string, any>
-  formData?: Record<string, any>
-  jsonResponse?: Record<string, any>
-  urlEncodedFormData?: Record<string, any>
+  queryParams?: Record<string, any> | undefined
+  jsonBody?: Record<string, any> | undefined
+  commonParams?: Record<string, any> | undefined
+  formData?: Record<string, any> | undefined
+  jsonResponse?: Record<string, any> | undefined
+  urlEncodedFormData?: Record<string, any> | undefined
   // TODO support error responses
 }
 
