@@ -51,6 +51,50 @@ type FilterToMostSpecificRoute<
   ? MatchedRoutes
   : ExactMatchingRouteByPath<MatchedRoutes, Path>
 
+// Helper type to check if two path segments match (handling [param] syntax)
+type SegmentMatches<Segment extends string, TemplateSegment extends string> = 
+  TemplateSegment extends `[${string}]` 
+    ? true 
+    : Segment extends TemplateSegment 
+    ? true 
+    : false
+
+// Helper type to match path segments recursively
+type PathSegmentsMatch<
+  PathSegments extends readonly string[],
+  TemplateSegments extends readonly string[]
+> = PathSegments extends readonly [infer PathHead, ...infer PathTail]
+  ? TemplateSegments extends readonly [infer TemplateHead, ...infer TemplateTail]
+    ? PathHead extends string
+      ? TemplateHead extends string
+        ? PathTail extends readonly string[]
+          ? TemplateTail extends readonly string[]
+            ? SegmentMatches<PathHead, TemplateHead> extends true
+              ? PathSegmentsMatch<PathTail, TemplateTail>
+              : false
+            : false
+          : false
+        : false
+      : false
+    : false
+  : TemplateSegments extends readonly []
+  ? true
+  : false
+
+// Helper type to match a path against a route template
+type PathMatchesRouteTemplate<
+  Path extends string,
+  Template extends string
+> = string extends Path 
+  ? false
+  : string extends Template
+  ? false  
+  : Path extends Template
+  ? true
+  : PathSegmentsMatch<Split<Path, "/">, Split<Template, "/">> extends true
+  ? true
+  : false
+
 export type MatchingRoute<
   Routes extends RouteDef,
   Path extends AnyRoutePath<Routes>,
@@ -59,7 +103,7 @@ export type MatchingRoute<
   Path,
   Routes extends infer Route
     ? Route extends RouteDef
-      ? Split<Path, "/"> extends Split<Route["route"], "/">
+      ? PathMatchesRouteTemplate<Path, Route["route"]> extends true
         ? Route["method"] extends Method
           ? Route
           : never
