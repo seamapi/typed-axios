@@ -28,7 +28,7 @@
   "devDependencies": {
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "^9.0.2",
+    "@semantic-release/npm": "^13.2.0",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "ava": "^5.1.0",
     "axios": "^1.2.2",
@@ -38,6 +38,6 @@
     "prettier": "^2.8.3",
     "tsup": "^9.0.0",
     "type-fest": "^3.7.0",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   }
 }
